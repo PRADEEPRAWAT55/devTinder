@@ -1,6 +1,6 @@
 const express = require('express');
-const { authMiddleware } = require('../middleware/auth');
 const { ConnectionRequest } = require('../model/connection');
+const { sendEmail } = require('../utils/ses/sendEmail');
 
 const User = require('../model/user').User;
 
@@ -30,7 +30,7 @@ requestRouter.post('/:status/:userId', async (req, res, next) => {
 
         const alreadyConnected = await newRequest.alreadyConnected();
         if (alreadyConnected) {
-            return res.status(400).json({ message: 'Connection request already exists or users are already connected.' });
+            return res.status(400).json({ message: 'Connection request already exists or users are already connected or interested.' });
         }
         const itsMatch = await newRequest.itsMatch();
         if (itsMatch) {
@@ -46,15 +46,14 @@ requestRouter.post('/:status/:userId', async (req, res, next) => {
         }
 
         await newRequest.save();
+
+        sendEmail();
         return res.status(200).json({ message: 'Connection request sent as interested.' });
     } catch (error) {
         console.error('Error sending connection request:', error);
         return res.status(500).json({ message: 'Error sending connection request.', error: error.message });
     }
 });
-
-
-
 
 
 requestRouter.post('/review/:status/:requestId', async (req, res) => {
@@ -68,22 +67,12 @@ requestRouter.post('/review/:status/:requestId', async (req, res) => {
             return res.status(400).json({ message: 'Invalid status value.' });
         }
 
-        const connectionRequest = await ConnectionRequest.findById(requestId);
+        const connectionRequest = await ConnectionRequest.findOne({ _id: requestId, recipient, status: 'interested' });
         if (!connectionRequest) {
             return res.status(404).json({ message: 'Connection request not found.' });
         }
-        if(connectionRequest.status !== 'interested'){
-            return  res.status(400).json({ message: `Connection request already reviewed with status: ${connectionRequest.status}.` });
-        }
-        if(connectionRequest.status === 'ignore'){
-            return  res.status(400).json({ message: `Connection request was ignored by Sender.` });
-        }
-
-        if (connectionRequest.recipient.toString() !== recipient.toString()) {
-            return res.status(403).json({ message: 'You are not authorized to review this connection request.' });
-        }
-
-        connectionRequest.status = status;  
+    
+        connectionRequest.status = status;
         if (status === 'accepted') {
             connectionRequest.matchedBy = recipient;
             connectionRequest.matchedAt = new Date();

@@ -1,9 +1,8 @@
-const databaseConfig = 'mongodb+srv://pradeep2000rawat:xD5x87gn4Ri57bEi@cluster0.cxbqyoo.mongodb.net/devTinder'
 
 const mongoose = require('mongoose');
-
+const URI = process.env.DB_CONNECTION_SECRET;
 async function connectDB() {
-    await mongoose.connect(databaseConfig);
+    await mongoose.connect(URI);
 }
 
 module.exports = connectDB;

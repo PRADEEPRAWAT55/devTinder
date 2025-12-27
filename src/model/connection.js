@@ -21,10 +21,11 @@ connectionRequest.methods.alreadyConnected = async function () {
             { requester: this.requester, recipient: this.recipient },
             { requester: this.recipient, recipient: this.requester }
         ],
-        status: { $in: ['accepted'] }
+        status: { $in: ['accepted' , 'interested'] }
     });
     return !!existingConnection;
 };
+
 connectionRequest.methods.itsMatch = async function () {
     const match = await ConnectionRequest.findOne({
         requester: this.recipient,

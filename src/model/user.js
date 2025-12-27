@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.getJWT = function () {
     const jwt = require('jsonwebtoken');
-    const token = jwt.sign({ userId: this._id, emailId: this.emailId }, 'PALLU@1234', { expiresIn: '8h' });
+    const token = jwt.sign({ userId: this._id, emailId: this.emailId }, process.env.JWT_SECRET, { expiresIn: '8h' });
     return token;
 }       
 
