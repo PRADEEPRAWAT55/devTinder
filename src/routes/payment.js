@@ -44,23 +44,37 @@ paymentRouter.post("/verify-payment", async (req, res) => {
         const { userId, amount, currency, orderId, status, notes } = req.body;
 
         const webhookSignature = req.headers['x-razorpay-signature'];
-        const webhookSecret = process.env.ROZERPAY_KEY_SECRET;
+        const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
         const webhookBody = req.body;
 
 
-        validateWebhookSignature(JSON.stringify(webhookBody), webhookSignature, webhookSecret)
+        const isValid = validateWebhookSignature(JSON.stringify(webhookBody), webhookSignature, webhookSecret)
 
+        if (!isValid) {
+            return res.status(400).json({ message: "Invalid webhook signature" });
+        }
+        const paymentDetails = req.body.payload.payment.entity;
 
-        const payment = new Payment({
-            userId,
-            amount,
-            currency,
-            orderId,
-            status,
-            notes,
-        });
+        const payment = Payment.findOne({ orderId: paymentDetails.order_id });
+        if (!payment) {
+            return res.status(404).json({ message: "Payment record not found" });
+        }
+
+        payment.status = paymentDetails.status;
+        payment.paymentId = paymentDetails.id;
+        payment.method = paymentDetails.method;
+        payment.updatedAt = new Date();
+
 
         const result = await payment.save();
+
+
+        const user = await User.findById(userId);
+        if (user) {
+            user.isPremium = true;
+            await user.save();
+        }
+
         res.status(201).json({ message: "Payment recorded successfully", paymentId: result._id });
     } catch (error) {
         console.error("Error recording payment:", error);

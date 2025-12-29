@@ -43,7 +43,7 @@ authRouter.post('/signin', async (req, res) => {
     }
     const token = await user.getJWT();
     res.cookie('token', token, { expires: new Date(Date.now() + 8 * 3600000), httpOnly: true });
-    res.status(200).json({ message: 'Sign in successful', userId: user._id });
+    res.status(200).json({ message: 'Sign in successful', userId: user._id , token });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }

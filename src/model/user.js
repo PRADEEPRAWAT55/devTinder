@@ -62,15 +62,19 @@ const userSchema = new mongoose.Schema({
     },
     skills: {
         type: [String]
+    },
+    isPremium:
+    {
+        type: Boolean,
+        default: false
     }
-
 }, { timestamps: true });
 
 userSchema.methods.getJWT = function () {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign({ userId: this._id, emailId: this.emailId }, process.env.JWT_SECRET, { expiresIn: '8h' });
     return token;
-}       
+}
 
 userSchema.methods.validatePassword = async function (password) {
     const bcrypt = require('bcrypt');
