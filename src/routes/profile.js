@@ -4,7 +4,7 @@ const User = require('../model/user').User;
 
 profileRouter = express.Router();
 
-profileRouter.get('/api/profile', async (req, res) => {
+profileRouter.get('/', async (req, res) => {
     try {
         const userId = req.decodedObject.userId;
         const userProfile = await User.findById(userId).select('-password');

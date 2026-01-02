@@ -32,7 +32,7 @@ paymentRouter.post("/create-order", async (req, res) => {
 
         const result = await payment.save();
 
-        res.status(201).json({ result, message: "Order created successfully" });
+        res.status(201).json({ result, key: process.env.RAZORPAY_KEY_ID, message: "Order created successfully" });
     } catch (error) {
         console.error("Error creating order:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });

@@ -7,7 +7,7 @@ const User = require('../model/user').User;
 
 const authRouter = express.Router();
 
-authRouter.post('/signup', loginLimiter, async (req, res) => {
+authRouter.post('/signup', async (req, res) => {
   try {
     validateSignUp(req);
     const passwordHash = await bcrypt.hash(req.body.password, 10);
@@ -29,7 +29,7 @@ authRouter.post('/signup', loginLimiter, async (req, res) => {
   }
 });
 
-authRouter.post('/signin', async (req, res) => {
+authRouter.post('/signin',loginLimiter, async (req, res) => {
   try {
     validateSignIn(req);
     const { emailId, password } = req.body;

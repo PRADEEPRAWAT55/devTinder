@@ -67,6 +67,14 @@ const userSchema = new mongoose.Schema({
     {
         type: Boolean,
         default: false
+    },
+    membershipTier: {
+        type: String,
+        enum: ['free', 'silver', 'gold'],
+        default: 'free'
+    },
+    membershipExpiresAt: {
+        type: Date
     }
 }, { timestamps: true });
 
