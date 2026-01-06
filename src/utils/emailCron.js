@@ -10,9 +10,6 @@ const emailQueue = new Queue('emailQueue', {
 cron.schedule('51 12 * * *', async () => {
 
     try {
-        console.log('🕙 Starting daily email for users about their admirers...');
-
-
         const allInterestedRequests = await ConnectionRequest.find({ status: 'interested' }).populate('recipient', '-password').populate('requester', 'firstName lastName');
 
         const recipientEmails = new Map();

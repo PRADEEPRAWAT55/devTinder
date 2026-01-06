@@ -9,6 +9,7 @@ const requestRouter = require('./routes/request');
 const userRouter = require('./routes/user');
 const { authMiddleware } = require('./middleware/auth');
 const paymentRouter = require('./routes/payment');
+const chatRouter = require('./routes/chat');
 const http = require('http');
 const initializeSocket = require('./utils/socket/socket');
 
@@ -30,6 +31,7 @@ app.use('/api/request', authMiddleware, requestRouter);
 app.use('/api/profile', authMiddleware, profileRouter);
 app.use('/api/user', authMiddleware, userRouter);
 app.use('/api/payment', authMiddleware, paymentRouter);
+app.use('/api/chat', authMiddleware, chatRouter);
 
 
 const httpServer = http.createServer(app);

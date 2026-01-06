@@ -13,7 +13,6 @@ const authMiddleware = (req, res, next) => {
         }
         req.decodedObject = decoded;
         const user = await User.findById(decoded.userId).select('-password');
-        console.log(user);
         req.user = user;
         next();
     });

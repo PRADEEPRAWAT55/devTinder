@@ -11,7 +11,7 @@ const emailQueueWorker = new Worker('emailQueue', async job => {
     if (job.name === 'sendEmail') {
         const { subject, body } = job.data;
         try {
-            await sendEmail(subject, body);
+            await sendEmail(subject, body);  // ses email sending
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error);
@@ -20,7 +20,7 @@ const emailQueueWorker = new Worker('emailQueue', async job => {
 },{connection});
 
 emailQueueWorker.on('completed', job => {
-    console.log(`Job ${job.id} has completed!`);
+    console.log(`Job ${job.id} has completed!`); // You can add additional logic here if needed
 });
 
 emailQueueWorker.on('failed', (job, err) => {
