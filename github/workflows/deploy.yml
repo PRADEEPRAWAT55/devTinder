@@ -20,7 +20,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: 
+          script: |
             cd /home/ubuntu/devTinder
             git pull
             npm ci
