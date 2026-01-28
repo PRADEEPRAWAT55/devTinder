@@ -9,7 +9,7 @@ const authRouter = express.Router();
 
 authRouter.post('/signup', async (req, res) => {
   try {
-    validateSignUp(req);
+    await validateSignUp(req);
     const passwordHash = await bcrypt.hash(req.body.password, 10);
 
     const user = new User({

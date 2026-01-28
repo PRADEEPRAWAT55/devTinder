@@ -23,7 +23,7 @@ profileRouter.patch('/update', async (req, res) => {
     try {
         const userId = req.decodedObject.userId;
         const updateData = req.body;    
-        const ENABLED_FIELDS = ['firstName', 'lastName', 'age', 'gender'];
+        const ENABLED_FIELDS = ['firstName', 'lastName', 'age', 'gender', 'about', 'skills', 'photoUrl'];
         const set = new Set();
         const fields = Object.keys(updateData);
         for (let field of fields) {

@@ -10,6 +10,7 @@ const connectionRequest = new mongoose.Schema({
         },
         required: true
     },
+    message: { type: String, default: null }, // Optional message from requester
     matchedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     matchedAt: { type: Date },
 }, { timestamps: true });

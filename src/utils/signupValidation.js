@@ -1,6 +1,7 @@
 const validator = require('validator');
+const { User } = require('../model/user');
 
-const validateSignUp = (req) => {
+const validateSignUp = async (req) => {
     const { firstName, emailId, password, age } = req.body;
     if(firstName.length <4 || firstName.length >50){
         throw new Error("First Name must be between 4 and 50 characters");
@@ -22,7 +23,10 @@ const validateSignUp = (req) => {
         throw new Error("Age must be a valid number between 0 and 120");
     }   
 
-    
+    const user = await User.findOne({ emailId });
+    if (user) {
+        throw new Error("Email is already in use");
+    }
 }
 
 module.exports = {

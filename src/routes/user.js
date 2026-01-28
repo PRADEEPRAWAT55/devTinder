@@ -7,16 +7,22 @@ const userRouter = express.Router();
 
 
 userRouter.get('/connections', async (req, res) => {
-    const recipient = req.user._id;
+    const userId = req.user._id;
     try {
-        const connectionRequest = await ConnectionRequest.find({ $or: [{ requester: recipient }, { recipient: recipient }], status: 'accepted' }).populate('requester', '-password -emailId').populate('recipient', '-password -emailId');
-        if (!connectionRequest) {
-            return res.status(404).json({ message: 'Connection request not found.' });
+        const connections = await ConnectionRequest.find({
+            $or: [
+                { requester: userId, status: 'accepted' },
+                { recipient: userId, status: 'accepted' }
+            ]
+        }).populate('requester', '-password -emailId').populate('recipient', '-password -emailId');
+        
+        if (!connections || connections.length === 0) {
+            return res.status(200).json({ connections: [] });
         }
 
-        res.status(200).json({ connectionRequest });
+        res.status(200).json({ connections });
     } catch (error) {
-        console.error('Error fetching connection request:', error);
+        console.error('Error fetching connections:', error);
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 });
@@ -37,10 +43,30 @@ userRouter.get('/feed', async (req, res) => {
     const userId = req.user._id;
     const {page = 1, limit = 10} = req.query;
     const skip = (page - 1) * limit;
+    
     try {
-        const sentRequests = await ConnectionRequest.find({ $or: [{ requester: userId }, { recipient: userId }]}).select('recipient requester');
-        const sentRecipientIds = sentRequests.map(request => request.recipient);
-        const feedUsers = await User.find({ _id: { $ne: userId, $nin: sentRecipientIds } }).select('-password -emailId').skip(parseInt(skip)).limit(parseInt(limit));
+        // Find all requests where current user is involved (sent or received)
+        const requests = await ConnectionRequest.find({
+            $or: [
+                { requester: userId },
+                { recipient: userId }
+            ]
+        }).select('requester recipient');
+
+        // Extract user IDs to exclude
+        const excludedUserIds = new Set();
+        excludedUserIds.add(userId.toString());
+        
+        requests.forEach(req => {
+            excludedUserIds.add(req.requester.toString());
+            excludedUserIds.add(req.recipient.toString());
+        });
+
+        // Get feed with pagination
+        const feedUsers = await User.find({ 
+            _id: { $nin: Array.from(excludedUserIds) } 
+        }).select('-password -emailId').skip(parseInt(skip)).limit(parseInt(limit));
+        
         res.status(200).json({ feed: feedUsers });
     } catch (error) {
         console.error('Error fetching feed users:', error);
