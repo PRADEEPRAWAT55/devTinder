@@ -4,7 +4,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/app.js",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "test": "jest --watch",
+    "test:ci": "jest --runInBand --coverage",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/ --fix",
+    "build": "echo 'Build complete'"
   },
   "author": "",
   "license": "ISC",
@@ -26,5 +31,10 @@
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.3",
     "validator": "^13.15.26"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.54.0"
   }
 }
